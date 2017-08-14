@@ -73,7 +73,7 @@ function panel()
     echo "  noninteractive-alignment-panel.py stopped at `date`" >> $log
 
     echo "  proteins-to-pathogens.py started at `date`" >> $log
-    echo summary-proteins | proteins-to-pathogens.py --proteinFastaFilename $dbFastaFile > summary-virus
+    echo summary-proteins | proteins-to-pathogens.py > $out
     echo "  proteins-to-pathogens.py stopped at `date`" >> $log
 }
 

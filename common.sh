@@ -9,9 +9,10 @@ errorFile=../slurm-pipeline.error
 sampleLogFile=$logDir/sample.log
 statsDir=$rootDir/stats
 
-test -z "$SP_SIMULATE" && export SP_SIMULATE=0
-test -z "$SP_SKIP" && export SP_SKIP=0
-test -z "$SP_FORCE" && export SP_FORCE=0
+# A simple way to set defaults for our SP_* variables, without causing
+# problems by using test when set -e is active (causing scripts to exit
+# with status 1 and no explanation).
+echo ${SP_SIMULATE:=0} ${SP_SKIP:=0} ${SP_FORCE:=0} >/dev/null
 
 function sampleName()
 {

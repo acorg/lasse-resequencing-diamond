@@ -53,7 +53,7 @@ fi
 
 for task in $tasks
 do
-    echo "  task $task, FASTQ $fastq" >> $log
+    echo "  task $task" >> $log
 done
 
 for task in $tasks
