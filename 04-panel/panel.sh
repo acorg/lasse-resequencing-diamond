@@ -1,6 +1,23 @@
 #!/bin/bash -e
 
-. $HOME/.virtualenvs/35/bin/activate
+root=/rds/project/djs200/rds-djs200-acorg/bt/root
+
+if [ ! -d $root ]
+then
+    echo "  Root directory '$root' does not exist." >> $log
+    exit 1
+fi
+
+activate=$root/share/virtualenvs/365/bin/activate
+
+if [ ! -f $activate ]
+then
+    echo "  Virtualenv activation script '$activate' does not exist." >> $log
+    exit 1
+fi
+
+. $activate
+
 . ../common.sh
 
 # The log file is the top-level sample log file, seeing as this step is a
@@ -12,7 +29,7 @@ echo "04-panel started at `date`" >> $log
 
 
 # Find the sequence files that correspond to this sample.
-tasks=$(find $rootDir -name '*.trim.fastq.gz')
+tasks=$(ls ../03-diamond/*.json.bz2)
 
 if [ -z "$tasks" ]
 then
@@ -25,7 +42,7 @@ allFASTQ=
 for task in $tasks
 do
     echo "  Task (i.e., sequencing run) $task" >> $log
-    base=$(basename $task | sed -e 's/\.trim\.fastq\.gz//')
+    base=$(basename $task | sed -e 's/\.json\.bz2//')
 
     JSON=../03-diamond/$base.json.bz2
     test -f $JSON || {
@@ -43,7 +60,7 @@ do
     allFASTQ="$allFASTQ $FASTQ"
 done
 
-dbFastaFile=$HOME/scratch/root/share/ncbi/viral-refseq/viral-protein-20161124/viral.protein.fasta
+dbFastaFile=$root/share/ncbi/viral-refseq/viral-protein-20161124/viral.protein.fasta
 
 if [ ! -f $dbFastaFile ]
 then
@@ -67,9 +84,9 @@ function panel()
       --fastq $allFASTQ \
       --matcher diamond \
       --outputDir out \
-      --scoreCutoff 50 \
-      --titleRegex 'hbv|hepatitis' \
-      --diamondDatabaseFastaFilename $dbFastaFile > summary-proteins
+      --maxTitles 500 \
+      --scoreCutoff 40 \
+      --negativeTitleRegex phage > summary-proteins
     echo "  noninteractive-alignment-panel.py stopped at `date`" >> $log
 
     echo "  proteins-to-pathogens.py started at `date`" >> $log
